@@ -1,8 +1,10 @@
 import React from 'react';
 import { useJoonweb } from '@joonweb/react';
+import { useAppBridge } from '@joonweb/app-bridge-react';
 import { Settings, BarChart3, Users, Zap, Package } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
+  const { appBridge, isReady: isBridgeReady } = useAppBridge();
   const { isReady, siteDomain, sessionToken } = useJoonweb();
 
   if (!isReady) {
@@ -52,7 +54,14 @@ const Dashboard: React.FC = () => {
             Managing <strong style={{ color: '#fff' }}>{siteDomain}</strong>
           </p>
         </div>
-        <button className="btn-primary" style={{ display: 'flex', gap: '8px', alignItems: 'center', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', padding: '10px 20px', borderRadius: '12px', color: '#fff', cursor: 'pointer', transition: 'all 0.2s' }}>
+        <button 
+          onClick={() => {
+            if (isBridgeReady) {
+              appBridge.actions.Toast.show({ message: 'Settings opened via App Bridge!' });
+            }
+          }}
+          className="btn-primary" 
+          style={{ display: 'flex', gap: '8px', alignItems: 'center', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', padding: '10px 20px', borderRadius: '12px', color: '#fff', cursor: 'pointer', transition: 'all 0.2s' }}>
           <Settings size={18} />
           <span>App Settings</span>
         </button>
