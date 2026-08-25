@@ -56,7 +56,6 @@ async function createServer() {
       
       // Redirect back to the React UI, carrying the app bridge parameters
       const host = req.query.host;
-      const site = req.query.site;
       const clientId = process.env.JOONWEB_CLIENT_ID;
       
       return res.redirect(`/?client_id=${clientId}&host=${host}&site=${site}`);
