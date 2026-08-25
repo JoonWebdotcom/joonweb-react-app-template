@@ -58,7 +58,15 @@ const Dashboard: React.FC = () => {
 
   const handleNavigation = () => {
     if (appBridge) {
-      appBridge.actions.Navigation.redirect({ url: '/settings' });
+      // Create a menu in the parent JoonWeb Admin Dashboard
+      appBridge.actions.Navigation.setMenu({
+        items: [
+          { label: 'Overview', destination: '/', active: true },
+          { label: 'Settings', destination: '/settings' },
+          { label: 'Help', destination: '/help' }
+        ]
+      });
+      appBridge.actions.Toast.show({ message: 'Menu injected into JoonWeb Admin!' });
     }
   };
 
@@ -133,7 +141,7 @@ const Dashboard: React.FC = () => {
               Open File Manager
             </button>
             <button style={styles.actionButton} onClick={handleNavigation}>
-              Test Navigation (/settings)
+              Create Admin Menu (Navigation)
             </button>
             <button style={styles.actionButton} onClick={() => appBridge?.actions.Toast.show({ message: 'Hello from React!' })}>
               Show Toast
