@@ -1,7 +1,7 @@
 import express from 'express';
 import { createServer as createViteServer } from 'vite';
 import joonwebApi from '@joonweb/api';
-const { Context, Auth } = joonwebApi;
+const { Context, OAuth } = joonwebApi;
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -31,7 +31,8 @@ async function createServer() {
       }
 
       const redirectUri = process.env.JOONWEB_REDIRECT_URI || `${req.protocol}://${req.get('host')}/auth/callback`;
-      const authUrl = await Auth.beginAuth(req, res, site, redirectUri);
+      const scopes = ['read_products', 'write_products'];
+      const authUrl = OAuth.getAuthorizationUrl(site, scopes, redirectUri);
       
       return res.redirect(authUrl);
     } catch (e) {
@@ -43,11 +44,15 @@ async function createServer() {
   // Joonweb OAuth Callback Route
   app.get('/auth/callback', async (req, res) => {
     try {
+      const site = req.query.site;
+      const code = req.query.code;
+      if (!site || !code) return res.status(400).send('Missing site or code parameters');
+
       // Securely exchange code for token using the client secret
-      const session = await Auth.validateCallback(req, res);
+      const session = await OAuth.exchangeCodeForToken(site, code);
       
       // Successfully authenticated! In a production app, save session.accessToken to your database here.
-      console.log(`OAuth successful for ${session.siteDomain}`);
+      console.log(`OAuth successful for ${site}`);
       
       // Redirect back to the React UI, carrying the app bridge parameters
       const host = req.query.host;
