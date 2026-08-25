@@ -38,6 +38,19 @@ const Dashboard: React.FC = () => {
     }
   }, [sessionToken, siteDomain, appBridge]);
 
+  // Auto-inject the Admin Menu when the bridge is ready
+  React.useEffect(() => {
+    if (appBridge) {
+      appBridge.actions.Navigation.setMenu({
+        items: [
+          { label: 'Overview', destination: '/', active: true },
+          { label: 'Settings', destination: '/settings' },
+          { label: 'Help', destination: '/help' }
+        ]
+      });
+    }
+  }, [appBridge]);
+
   const handleProductPicker = async () => {
     try {
       const selected = await appBridge?.actions.Components.show('ProductPicker');
@@ -53,20 +66,6 @@ const Dashboard: React.FC = () => {
       appBridge?.actions.Toast.show({ message: `File selected: ${file?.name || 'Unknown'}` });
     } catch (e) {
       console.log('File manager closed', e);
-    }
-  };
-
-  const handleNavigation = () => {
-    if (appBridge) {
-      // Create a menu in the parent JoonWeb Admin Dashboard
-      appBridge.actions.Navigation.setMenu({
-        items: [
-          { label: 'Overview', destination: '/', active: true },
-          { label: 'Settings', destination: '/settings' },
-          { label: 'Help', destination: '/help' }
-        ]
-      });
-      appBridge.actions.Toast.show({ message: 'Menu injected into JoonWeb Admin!' });
     }
   };
 
@@ -139,9 +138,6 @@ const Dashboard: React.FC = () => {
             </button>
             <button style={styles.actionButton} onClick={handleFileManager}>
               Open File Manager
-            </button>
-            <button style={styles.actionButton} onClick={handleNavigation}>
-              Create Admin Menu (Navigation)
             </button>
             <button style={styles.actionButton} onClick={() => appBridge?.actions.Toast.show({ message: 'Hello from React!' })}>
               Show Toast
