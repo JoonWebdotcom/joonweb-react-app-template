@@ -81,7 +81,7 @@ async function createServer() {
       if (!token) return res.status(401).send('Unauthorized: App must be re-installed to get a fresh token.');
 
       const joonweb = new joonwebApi.JoonWebAPI(token, site);
-      const products = await joonweb.product.list(); // SDK call to fetch products
+      const products = await joonweb.product.all(); // SDK call to fetch products
       
       res.json({ data: products.data || [] });
     } catch (error) {
