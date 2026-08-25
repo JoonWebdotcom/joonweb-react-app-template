@@ -7,5 +7,6 @@ export default defineConfig({
     port: 5173,
     // When embedded, we might need to allow external connections if using ngrok
     host: true,
+    allowedHosts: true,
   },
 });
