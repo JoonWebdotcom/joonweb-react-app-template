@@ -53,8 +53,11 @@ const Dashboard: React.FC = () => {
 
   const handleProductPicker = async () => {
     try {
-      const selected = await appBridge?.actions.Components.show('ProductPicker');
-      appBridge?.actions.Toast.show({ message: `Selected ${selected?.length || 0} products` });
+      if (appBridge && appBridge.actions.Components) {
+        const Components = appBridge.actions.Components.create(appBridge);
+        const selected = await Components.show('ProductPicker');
+        appBridge.actions.Toast.show({ message: `Selected ${selected?.length || 0} products` });
+      }
     } catch (e) {
       console.log('Product picker closed', e);
     }
@@ -62,8 +65,11 @@ const Dashboard: React.FC = () => {
 
   const handleFileManager = async () => {
     try {
-      const file = await appBridge?.actions.Components.show('FileManager');
-      appBridge?.actions.Toast.show({ message: `File selected: ${file?.name || 'Unknown'}` });
+      if (appBridge && appBridge.actions.Components) {
+        const Components = appBridge.actions.Components.create(appBridge);
+        const file = await Components.show('FileManager');
+        appBridge.actions.Toast.show({ message: `File selected: ${file?.name || 'Unknown'}` });
+      }
     } catch (e) {
       console.log('File manager closed', e);
     }
@@ -71,9 +77,12 @@ const Dashboard: React.FC = () => {
 
   const handleLinkManager = async () => {
     try {
-      const link = await appBridge?.actions.Components.show('LinkManager');
-      appBridge?.actions.Toast.show({ message: `Link selected: ${link?.title || 'Unknown'}` });
-      console.log('Link Manager opened', link);
+      if (appBridge && appBridge.actions.Components) {
+        const Components = appBridge.actions.Components.create(appBridge);
+        const link = await Components.show('LinkManager');
+        appBridge.actions.Toast.show({ message: `Link selected: ${link?.title || 'Unknown'}` });
+        console.log('Link Manager opened', link);
+      }
     } catch (e) {
       console.log('Link manager closed', e);
     }
