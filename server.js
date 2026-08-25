@@ -1,6 +1,7 @@
 import express from 'express';
 import { createServer as createViteServer } from 'vite';
-import { Context, Auth } from '@joonweb/api';
+import joonwebApi from '@joonweb/api';
+const { Context, Auth } = joonwebApi;
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
