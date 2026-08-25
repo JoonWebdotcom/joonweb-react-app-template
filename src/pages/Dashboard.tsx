@@ -40,7 +40,7 @@ const Dashboard: React.FC = () => {
 
   const handleProductPicker = async () => {
     try {
-      const selected = await appBridge?.actions.Components.show('ProductPicker', { multiple: true });
+      const selected = await appBridge?.actions.Components.show('ProductPicker');
       appBridge?.actions.Toast.show({ message: `Selected ${selected?.length || 0} products` });
     } catch (e) {
       console.log('Product picker closed', e);
@@ -53,6 +53,12 @@ const Dashboard: React.FC = () => {
       appBridge?.actions.Toast.show({ message: `File selected: ${file?.name || 'Unknown'}` });
     } catch (e) {
       console.log('File manager closed', e);
+    }
+  };
+
+  const handleNavigation = () => {
+    if (appBridge) {
+      appBridge.actions.Navigation.redirect({ url: '/settings' });
     }
   };
 
@@ -125,6 +131,9 @@ const Dashboard: React.FC = () => {
             </button>
             <button style={styles.actionButton} onClick={handleFileManager}>
               Open File Manager
+            </button>
+            <button style={styles.actionButton} onClick={handleNavigation}>
+              Test Navigation (/settings)
             </button>
             <button style={styles.actionButton} onClick={() => appBridge?.actions.Toast.show({ message: 'Hello from React!' })}>
               Show Toast
