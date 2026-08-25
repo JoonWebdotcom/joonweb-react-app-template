@@ -69,6 +69,16 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const handleLinkManager = async () => {
+    try {
+      const link = await appBridge?.actions.Components.show('LinkManager');
+      appBridge?.actions.Toast.show({ message: `Link selected: ${link?.title || 'Unknown'}` });
+      console.log('Link Manager opened', link);
+    } catch (e) {
+      console.log('Link manager closed', e);
+    }
+  };
+
   if (!isBridgeReady) {
     return (
       <div style={styles.loadingContainer}>
@@ -138,6 +148,9 @@ const Dashboard: React.FC = () => {
             </button>
             <button style={styles.actionButton} onClick={handleFileManager}>
               Open File Manager
+            </button>
+            <button style={styles.actionButton} onClick={handleLinkManager}>
+              Open Link Manager
             </button>
             <button style={styles.actionButton} onClick={() => appBridge?.actions.Toast.show({ message: 'Hello from React!' })}>
               Show Toast
