@@ -54,11 +54,12 @@ async function createServer() {
       // Successfully authenticated! In a production app, save session.accessToken to your database here.
       console.log(`OAuth successful for ${site}`);
       
-      // Redirect back to the React UI, carrying the app bridge parameters
-      const host = req.query.host;
-      const clientId = process.env.JOONWEB_CLIENT_ID;
+      // Redirect back to JoonWeb embed URL so the app loads inside the iframe
+      const site_hash = req.query.site_hash || '';
+      const app_slug = req.query.app_slug || process.env.JOONWEB_CLIENT_ID;
       
-      return res.redirect(`/?client_id=${clientId}&host=${host}&site=${site}`);
+      const embedUrl = `https://accounts.joonweb.com/site/?sitehash=${encodeURIComponent(site_hash)}&apps&${encodeURIComponent(app_slug)}`;
+      return res.redirect(embedUrl);
     } catch (e) {
       console.error('Failed to process callback', e);
       res.status(500).send(e.message);
