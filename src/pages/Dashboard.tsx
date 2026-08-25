@@ -17,26 +17,44 @@ const Dashboard: React.FC = () => {
   const [products, setProducts] = React.useState<any[]>([]);
 
   React.useEffect(() => {
-    if (sessionToken) {
+    if (sessionToken || siteDomain) {
       setLoading(true);
-      // In a real app, you would fetch from /api/products
-      // fetch('/api/products', { headers: { Authorization: `Bearer ${sessionToken}` } })
-      //   .then(res => res.json())
-      //   .then(data => setProducts(data.data || []))
-      //   .catch(err => console.error(err))
-      //   .finally(() => setLoading(false));
-
-      // Mock products for the template
-      setTimeout(() => {
-        setProducts([
-          { id: 1, title: 'Premium Cotton T-Shirt', stock: 42, price: '$24.99', status: 'Active' },
-          { id: 2, title: 'Minimalist Watch', stock: 15, price: '$129.00', status: 'Active' },
-          { id: 3, title: 'Wireless Earbuds', stock: 0, price: '$89.99', status: 'Out of Stock' }
-        ]);
-        setLoading(false);
-      }, 1000);
+      fetch(`/api/products?site=${siteDomain}`, { 
+        headers: { Authorization: `Bearer ${sessionToken}` } 
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.data) {
+             setProducts(data.data);
+          } else {
+             setProducts([]);
+          }
+        })
+        .catch(err => {
+          console.error('Failed to load products', err);
+          appBridge?.actions.Toast.show({ message: 'Failed to load products' });
+        })
+        .finally(() => setLoading(false));
     }
-  }, [sessionToken]);
+  }, [sessionToken, siteDomain, appBridge]);
+
+  const handleProductPicker = async () => {
+    try {
+      const selected = await appBridge?.actions.Components.show('product_picker', { multiple: true });
+      appBridge?.actions.Toast.show({ message: `Selected ${selected?.length || 0} products` });
+    } catch (e) {
+      console.log('Product picker closed', e);
+    }
+  };
+
+  const handleFileManager = async () => {
+    try {
+      const file = await appBridge?.actions.Components.show('file_manager');
+      appBridge?.actions.Toast.show({ message: `File selected: ${file?.name || 'Unknown'}` });
+    } catch (e) {
+      console.log('File manager closed', e);
+    }
+  };
 
   if (!isBridgeReady) {
     return (
@@ -98,11 +116,20 @@ const Dashboard: React.FC = () => {
 
         <div style={styles.card}>
           <div style={styles.cardHeader}>
-            <h3 style={styles.cardTitle}>App Status</h3>
+            <h3 style={styles.cardTitle}>App Bridge Components</h3>
             <Zap size={18} color="#6b7280" strokeWidth={1.5} />
           </div>
-          <div style={styles.metricValue}>Operational</div>
-          <p style={styles.metricTrend}>All services running smoothly</p>
+          <div style={styles.componentActions}>
+            <button style={styles.actionButton} onClick={handleProductPicker}>
+              Open Product Picker
+            </button>
+            <button style={styles.actionButton} onClick={handleFileManager}>
+              Open File Manager
+            </button>
+            <button style={styles.actionButton} onClick={() => appBridge?.actions.Toast.show({ message: 'Hello from React!' })}>
+              Show Toast
+            </button>
+          </div>
         </div>
       </div>
       
@@ -145,12 +172,12 @@ const Dashboard: React.FC = () => {
                        </span>
                      </td>
                      <td style={styles.td}>
-                       <span style={{ color: product.stock > 0 ? '#374151' : '#ef4444' }}>
-                         {product.stock} in stock
+                       <span style={{ color: product.stock > 0 || product.quantity > 0 ? '#374151' : '#ef4444' }}>
+                         {product.stock || product.quantity || 0} in stock
                        </span>
                      </td>
                      <td style={styles.td}>
-                       <span style={styles.productPrice}>{product.price}</span>
+                       <span style={styles.productPrice}>{product.price || product.price_raw || 'N/A'}</span>
                      </td>
                    </tr>
                  ))}
@@ -386,6 +413,24 @@ const styles: { [key: string]: React.CSSProperties } = {
     color: '#6b7280',
     fontSize: '14px',
   },
+  componentActions: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
+    marginTop: '16px',
+  },
+  actionButton: {
+    backgroundColor: '#f3f4f6',
+    color: '#374151',
+    border: '1px solid #e5e7eb',
+    padding: '10px 16px',
+    borderRadius: '6px',
+    fontSize: '14px',
+    fontWeight: 500,
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+    textAlign: 'left',
+  }
 };
 
 export default Dashboard;

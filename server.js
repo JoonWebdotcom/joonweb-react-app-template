@@ -14,6 +14,10 @@ async function createServer() {
   const app = express();
   const PORT = process.env.PORT || 5173;
 
+  // Simple in-memory session store for demo purposes. 
+  // In production, use a real database (Redis, Postgres, etc.)
+  const sessionStore = new Map();
+
   // Initialize Joonweb API SDK Context
   Context.init({
     apiKey: process.env.JOONWEB_CLIENT_ID || '',
@@ -51,7 +55,8 @@ async function createServer() {
       // Securely exchange code for token using the client secret
       const session = await OAuth.exchangeCodeForToken(site, code);
       
-      // Successfully authenticated! In a production app, save session.accessToken to your database here.
+      // Successfully authenticated! Save session.access_token to our store.
+      sessionStore.set(site, session.access_token);
       console.log(`OAuth successful for ${site}`);
       
       // Redirect back to JoonWeb embed URL so the app loads inside the iframe
@@ -63,6 +68,25 @@ async function createServer() {
     } catch (e) {
       console.error('Failed to process callback', e);
       res.status(500).send(e.message);
+    }
+  });
+
+  // Example API Route to fetch products using the JoonWeb SDK
+  app.get('/api/products', async (req, res) => {
+    try {
+      const site = req.query.site;
+      if (!site) return res.status(400).send('Missing site parameter');
+      
+      const token = sessionStore.get(site);
+      if (!token) return res.status(401).send('Unauthorized: App must be re-installed to get a fresh token.');
+
+      const joonweb = new joonwebApi.JoonWebAPI(token, site);
+      const products = await joonweb.product.list(); // SDK call to fetch products
+      
+      res.json({ data: products.data || [] });
+    } catch (error) {
+      console.error('Failed to fetch products', error);
+      res.status(500).json({ error: 'Failed to fetch products from JoonWeb' });
     }
   });
 
