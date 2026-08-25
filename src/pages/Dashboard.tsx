@@ -5,9 +5,14 @@ import { Settings, BarChart3, Users, Zap, Package } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
   const { appBridge, isReady: isBridgeReady } = useAppBridge();
-  const { isReady, siteDomain, sessionToken } = useJoonweb();
+  const params = new URLSearchParams(window.location.search);
+  const sessionToken = params.get('sessionToken') || localStorage.getItem('sessionToken') || '';
+  const siteDomain = params.get('site') || localStorage.getItem('site') || 'Unknown Store';
+  
+  if (params.get('sessionToken')) localStorage.setItem('sessionToken', params.get('sessionToken') as string);
+  if (params.get('site')) localStorage.setItem('site', params.get('site') as string);
 
-  if (!isReady) {
+  if (!isBridgeReady) {
     return (
       <div className="glass-card animate-fade-in" style={{ textAlign: 'center', marginTop: '20vh', maxWidth: '400px', margin: '20vh auto' }}>
         <div style={{ display: 'inline-block', width: '40px', height: '40px', border: '3px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 1s linear infinite', marginBottom: '1rem' }} />
