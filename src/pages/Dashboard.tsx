@@ -40,7 +40,7 @@ const Dashboard: React.FC = () => {
 
   const handleProductPicker = async () => {
     try {
-      const selected = await appBridge?.actions.Components.show('product_picker', { multiple: true });
+      const selected = await appBridge?.actions.Components.show('ProductPicker', { multiple: true });
       appBridge?.actions.Toast.show({ message: `Selected ${selected?.length || 0} products` });
     } catch (e) {
       console.log('Product picker closed', e);
@@ -49,7 +49,7 @@ const Dashboard: React.FC = () => {
 
   const handleFileManager = async () => {
     try {
-      const file = await appBridge?.actions.Components.show('file_manager');
+      const file = await appBridge?.actions.Components.show('FileManager');
       appBridge?.actions.Toast.show({ message: `File selected: ${file?.name || 'Unknown'}` });
     } catch (e) {
       console.log('File manager closed', e);
